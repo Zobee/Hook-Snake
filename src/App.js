@@ -9,8 +9,7 @@ import './App.css';
 /*
 TODO 
 -Disable reverse movement so you don't accidentally off yourself
--Add hangry feature, where if food hasn't been eaten after a certain number of ticks, the snake
-turns red and speed is doubled untill food is eaten
+
 */
 
 const rando = () => {
@@ -23,8 +22,6 @@ const getRandoCoords = () => {
 }
 
 
-
-
 function App() {
   const [direction, setDirection] = useState('D')
   const [segs, setSegs] = useState([[0,0],[2,0]])
@@ -32,21 +29,31 @@ function App() {
   const [speed, setSpeed] = useState(250)
   const [gameOver, setGameOver] = useState(false)
   const [score, setScore] = useState(0)
-
+  const [tick, setTick] = useState(0)
+  const [isMad, setIsMad] = useState(false)
 
   //Whenever a key is pressed, the keyPress function will run. A re-render will be triggered
   //if the direction variable changes
   const keyPress = useCallback((e) => {
   let key = e.key.toUpperCase()
-  setDirection(key)
+
+  setDirection(
+    (dir) => {
+      switch(key){
+        case 'W' :  return dir === 'S' ? 'S' : 'W'
+        break
+        case 'S' : return dir === 'W' ? 'W' : 'S'
+        break
+        case 'A' : return dir === 'D' ? 'D' : 'A'
+        break
+        case 'D' : return dir === 'A' ? 'A' : 'D'
+        break
+      }
+    }
+  )
+  
 }, [])
 
-  /*
-    setDirection(dir => dir === "W" && key === 'S' ? 'W' : key || dir === 'S' && key === 'W' ? "A" : key || dir === 'A' && key === 'S' ? "A" : key || dir === 'S' && key === 'A' ? 'A' : key)
-  */
-
-  
-  //This is effectively the componentDidMount and componentWillUnmount lifecycle methods
   useEffect(() => {
     
     document.addEventListener('keydown', keyPress)
@@ -68,12 +75,16 @@ function App() {
 
   useEffect(()=>{
     eat()
+
   },[food,segs])
+
+  useEffect(()=>{
+    speedUp()
+  },[isMad])
 
   const move = () => {
     let snek = [...segs]
     let head = snek[snek.length - 1]
-
   
     switch (direction){
       case 'D':
@@ -109,12 +120,26 @@ function App() {
   const eat = () => {
     let head = segs[segs.length - 1]
     let foodLocation = food
+
     if (head[0] === foodLocation[0] && head[1] === foodLocation[1]){
       setFood(getRandoCoords())
       getBig()
-      setSpeed(speed => speed > 20 ? speed - 10 : speed)
+      setSpeed(speed => speed > 30 ? speed - 10 : speed)
       setScore(score + 100)
+      setTick(0)
+    } else {
+      setTick(tick +1)
+
     }
+    hangry()
+  }
+
+  const hangry = () => {
+    return tick > (5 * segs.length) ? setIsMad(true) : tick === 0 ? setIsMad(false) : null
+  }
+
+  const speedUp = () => {
+    isMad ? setSpeed(speed/2) : score === 0 ? setSpeed(speed) : setSpeed(score > 2500 ? 20 : 250 - (score/10))
   }
 
   const getBig = () => {
@@ -129,6 +154,7 @@ function App() {
       setSpeed(250)
       setGameOver(false)
       setDirection('D')
+      setTick(0)
   }
 
   return (
@@ -136,7 +162,7 @@ function App() {
       <div className="game-board">
       {!gameOver ? 
       <div>
-        <Snake segs={segs}/>
+        <Snake isMad={isMad} segs={segs}/>
         <Pellet food={food}/>
       </div>
       : 

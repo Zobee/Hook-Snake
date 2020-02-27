@@ -2,10 +2,10 @@ import React from 'react'
 
 function GameOver({score, reset}) {
     return (
-        <div>
-            GAME OVER
+        <div className='gameOver'>
+            <h1>GAME OVER</h1>
             <br/>
-            SCORE : {score}
+            <h3>SCORE : {score}</h3>
             <br/>
             <button onClick={()=>reset()}>Play Again?</button>
         </div>
