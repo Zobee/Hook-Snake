@@ -30,3 +30,27 @@
   text-align: center;
   margin-top: 25%;
 }
+
+.start{
+  position: relative;
+  text-align: center;
+  margin-top: 20%;
+  margin-left: 5%;
+  margin-right: 5%;
+  font-family: cursive;
+}
+
+.startButton{
+  height: 100px;
+  border-radius: 50%;
+  border: solid 2px black;
+  background-color: red;
+  color: white;
+}
+
+.startButton:hover{
+  box-shadow:2px 0px 0px 0px black;
+  transform: translateY(2px);
+  background: #F33;
+  cursor: pointer;
+}
